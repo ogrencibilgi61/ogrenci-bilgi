@@ -1,2 +1,16 @@
 # Supabase CLI local state
 supabase/.temp/
+
+# Dependencies and local tooling
+node_modules/
+dist/
+
+# Local environment variables
+.env
+.env.*
+!.env.example
+
+# Editor and operating system files
+.DS_Store
+Thumbs.db
+*.local
