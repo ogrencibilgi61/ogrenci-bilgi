@@ -7,6 +7,10 @@ function getBasePath() {
     return process.env.VITE_BASE_PATH
   }
 
+  if (process.env.VERCEL) {
+    return '/'
+  }
+
   if (process.env.GITHUB_REPOSITORY) {
     return `/${process.env.GITHUB_REPOSITORY.split('/')[1]}/`
   }
