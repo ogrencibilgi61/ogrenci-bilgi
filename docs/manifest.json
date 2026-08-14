@@ -1,0 +1,19 @@
+{
+  "name": "Yoklama CRM",
+  "short_name": "Yoklama CRM",
+  "description": "Mobil uyumlu çok kurumlu öğrenci yoklama ve veli iletişim paneli.",
+  "start_url": "/ogrenci-bilgi/",
+  "scope": "/ogrenci-bilgi/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f8fb",
+  "theme_color": "#176b5b",
+  "icons": [
+    {
+      "src": "/ogrenci-bilgi/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

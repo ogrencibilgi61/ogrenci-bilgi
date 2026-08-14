@@ -1,12 +1,40 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useInstitution } from '../context/useInstitution'
 
 function LoginPage() {
   const navigate = useNavigate()
+  const {
+    authError,
+    isAuthLoading,
+    isSupabaseConfigured,
+    loginInstitution,
+    session,
+  } = useInstitution()
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  function handleSubmit(event) {
+  if (session) {
+    return <Navigate to="/dashboard" replace />
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault()
+    setIsSubmitting(true)
+    setError('')
+
+    const result = await loginInstitution(email.trim(), password)
+
+    setIsSubmitting(false)
+
+    if (!result.ok) {
+      setError(result.message)
+      return
+    }
+
     navigate('/dashboard')
   }
 
@@ -14,62 +42,85 @@ function LoginPage() {
     <main className="login-page">
       <section className="login-panel">
         <div className="brand login-brand">
-          <span className="brand-mark">Ö</span>
+          <span className="brand-mark">Y</span>
           <span className="brand-copy">
-            <strong>Öğrenci Bilgi</strong>
-            <small>Yoklama CRM</small>
+            <strong>Yoklama CRM</strong>
+            <small>Mudur paneli</small>
           </span>
         </div>
 
         <div className="login-copy">
-          <span className="page-eyebrow">Yönetici girişi</span>
-          <h1>Tekrar hoş geldiniz</h1>
-          <p>Devam etmek için yönetici hesabınızla giriş yapın.</p>
+          <span className="page-eyebrow">Mudur girisi</span>
+          <h1>Email ve sifre ile giris</h1>
+          <p>
+            {isSupabaseConfigured
+              ? 'Panel yalnizca yetkili mudur hesabi ile acilir.'
+              : 'Idarecinin ekledigi kurum maili ve kurum sifresiyle giris yapilir.'}
+          </p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
           <label>
-            <span>E-posta adresi</span>
+            <span>Email</span>
             <input
               type="email"
-              name="email"
-              placeholder="mudur@okul.com"
+              value={email}
+              placeholder="mudur@kurum.com"
               autoComplete="email"
+              onChange={(event) => {
+                setEmail(event.target.value)
+                setError('')
+              }}
               required
             />
           </label>
 
           <label>
-            <span>Şifre</span>
+            <span>Sifre</span>
             <span className="password-field">
               <input
                 type={showPassword ? 'text' : 'password'}
-                name="password"
-                placeholder="••••••••"
+                value={password}
+                placeholder="********"
                 autoComplete="current-password"
+                onChange={(event) => {
+                  setPassword(event.target.value)
+                  setError('')
+                }}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((current) => !current)}
               >
-                {showPassword ? 'Gizle' : 'Göster'}
+                {showPassword ? 'Gizle' : 'Goster'}
               </button>
             </span>
           </label>
 
-          <button className="primary-button" type="submit">
-            Giriş yap
+          {(error || (isSupabaseConfigured && authError)) && (
+            <p className="form-error">{error || authError}</p>
+          )}
+
+          <button
+            className="primary-button"
+            type="submit"
+            disabled={isSubmitting || isAuthLoading || !email.trim()}
+          >
+            {isSubmitting ? 'Giris yapiliyor...' : 'Dashboarda git'}
           </button>
           <small className="form-note">
-            Supabase kimlik doğrulaması sonraki adımda bağlanacak.
+            Veli kayit veya veli giris alani bulunmaz.
           </small>
+          <Link className="text-link" to="/admin/login">
+            Idareci girisi
+          </Link>
         </form>
       </section>
 
       <aside className="login-visual" aria-hidden="true">
         <div className="visual-card visual-card-main">
-          <span>Günlük yoklama</span>
+          <span>Gunluk yoklama</span>
           <strong>%92</strong>
           <div className="progress-track">
             <span />
@@ -77,7 +128,7 @@ function LoginPage() {
         </div>
         <div className="visual-card visual-card-small">
           <span className="visual-dot" />
-          <span>Veli bildirimleri hazır</span>
+          <span>Kurum verileri izole</span>
         </div>
       </aside>
     </main>

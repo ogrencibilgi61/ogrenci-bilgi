@@ -27,6 +27,12 @@ const paths = {
       <path d="M8 8h8M8 12h5" />
     </>
   ),
+  notes: (
+    <>
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+      <path d="M14 2v6h6M8 13h8M8 17h5" />
+    </>
+  ),
   reports: (
     <>
       <path d="M4 19V9M10 19V5M16 19v-7M22 19H2" />

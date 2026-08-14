@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { useInstitution } from '../../context/useInstitution'
 import NavIcon from '../icons/NavIcon'
 
 const primaryNavigation = [
   { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
   { label: 'Öğrenciler', path: '/ogrenciler', icon: 'students' },
   { label: 'Yoklama', path: '/yoklama', icon: 'attendance' },
-  { label: 'Mesajlar', path: '/mesajlar', icon: 'messages' },
+  { label: 'Toplu Mesaj', path: '/mesajlar', icon: 'messages' },
 ]
 
 const secondaryNavigation = [
   { label: 'Raporlar', path: '/raporlar', icon: 'reports' },
   { label: 'Eski Öğrenciler', path: '/eski-ogrenciler', icon: 'alumni' },
+  { label: 'Veli Notları', path: '/veli-notlari', icon: 'notes' },
   { label: 'Ayarlar', path: '/ayarlar', icon: 'settings' },
 ]
 
@@ -31,20 +33,28 @@ function NavigationLink({ item, onNavigate }) {
 }
 
 function AppShell() {
-  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const navigate = useNavigate()
   const { pathname } = useLocation()
+  const { session, logoutInstitution } = useInstitution()
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
   const isSecondaryActive = secondaryNavigation.some(
     (item) => item.path === pathname,
   )
+  const initials = session?.institutionName?.slice(0, 1).toUpperCase() ?? 'K'
+
+  async function handleLogout() {
+    await logoutInstitution()
+    navigate('/login')
+  }
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">Ö</span>
+          <span className="brand-mark">Y</span>
           <span className="brand-copy">
-            <strong>Öğrenci Bilgi</strong>
-            <small>Yönetim Paneli</small>
+            <strong>Yoklama CRM</strong>
+            <small>Kurum paneli</small>
           </span>
         </div>
 
@@ -55,23 +65,38 @@ function AppShell() {
           ))}
         </nav>
 
-        <div className="sidebar-profile">
-          <span className="avatar">M</span>
+        <button
+          className="sidebar-profile"
+          type="button"
+          onClick={handleLogout}
+          aria-label="Kurumdan çıkış yap"
+        >
+          <span className="avatar">{initials}</span>
           <span>
-            <strong>Müdür</strong>
-            <small>Yönetici</small>
+            <strong>{session?.institutionName}</strong>
+            <small>{session?.cityName}</small>
           </span>
           <NavIcon name="logout" size={18} />
-        </div>
+        </button>
       </aside>
 
       <div className="app-content">
         <header className="mobile-header">
           <div className="brand compact">
-            <span className="brand-mark">Ö</span>
-            <strong>Öğrenci Bilgi</strong>
+            <span className="brand-mark">Y</span>
+            <span className="brand-copy">
+              <strong>{session?.institutionName}</strong>
+              <small>{session?.cityName}</small>
+            </span>
           </div>
-          <span className="avatar">M</span>
+          <button
+            className="avatar avatar-button"
+            type="button"
+            onClick={handleLogout}
+            aria-label="Çıkış yap"
+          >
+            {initials}
+          </button>
         </header>
 
         <main className="page-content">
