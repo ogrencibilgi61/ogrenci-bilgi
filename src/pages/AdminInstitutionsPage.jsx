@@ -148,6 +148,9 @@ function AdminInstitutionsPage() {
                 const genderLabel =
                   institutionGenderLabels[institution.student_gender] ??
                   'Kurum tipi secilmedi'
+                const capacityOccupancyLabel = stats.capacity
+                  ? `${stats.capacity}/${stats.studentCount}`
+                  : `-/${stats.studentCount}`
 
                 return (
                   <details className="institution-card admin-info-card" key={institution.id}>
@@ -156,6 +159,11 @@ function AdminInstitutionsPage() {
                         <strong>{institution.name}</strong>
                         <small>
                           {genderLabel} - {institution.login_email ?? 'Mail yok'}
+                        </small>
+                        <small className="institution-summary-details">
+                          Sifre: {institution.login_password || '-'} - Personel:{' '}
+                          {stats.staffCount} - Kapasite/Doluluk:{' '}
+                          {capacityOccupancyLabel}
                         </small>
                       </span>
                       <span className={`status-pill ${institution.status}`}>
@@ -173,11 +181,11 @@ function AdminInstitutionsPage() {
                         <b>{stats.studentCount}</b>
                       </span>
                       <span>
-                        Kapasite
-                        <b>{stats.capacity || '-'}</b>
+                        Kapasite/Doluluk
+                        <b>{capacityOccupancyLabel}</b>
                       </span>
                       <span>
-                        Doluluk
+                        Doluluk %
                         <b>{stats.capacity ? `%${stats.occupancyRate}` : '-'}</b>
                       </span>
                       <span>

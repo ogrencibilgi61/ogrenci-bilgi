@@ -1426,6 +1426,11 @@ textarea:focus {
   font-weight: 700;
 }
 
+.admin-info-card summary .institution-summary-details {
+  white-space: normal;
+  line-height: 1.35;
+}
+
 .admin-info-card[open] summary {
   border-bottom: 1px solid var(--border);
 }
