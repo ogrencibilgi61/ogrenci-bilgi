@@ -447,20 +447,21 @@ export function InstitutionProvider({ children }) {
   }, [authSession, clearInstitutionSession])
 
   async function loginInstitution(email, password) {
-    if (!supabase) {
-      const selectedInstitution = data.institutions.find(
-        (institution) =>
-          institution.id === email ||
-          institution.login_email?.toLocaleLowerCase('tr') ===
-            email.toLocaleLowerCase('tr') ||
-          institution.name.toLocaleLowerCase('tr') ===
-            email.toLocaleLowerCase('tr'),
-      )
+    const selectedInstitution = data.institutions.find(
+      (institution) =>
+        institution.id === email ||
+        institution.login_email?.toLocaleLowerCase('tr') ===
+          email.toLocaleLowerCase('tr') ||
+        institution.name.toLocaleLowerCase('tr') ===
+          email.toLocaleLowerCase('tr'),
+    )
+
+    if (selectedInstitution) {
       const selectedCity = data.cities.find(
         (city) => city.id === selectedInstitution?.city_id,
       )
 
-      if (!selectedInstitution || selectedInstitution.status !== 'active') {
+      if (selectedInstitution.status !== 'active') {
         return { ok: false, message: 'Aktif kurum bulunamadı.' }
       }
 
@@ -477,11 +478,16 @@ export function InstitutionProvider({ children }) {
         cityName: selectedCity?.name ?? '',
       }
 
+      setAuthSession(null)
       setSession(nextSession)
       setAuthError('')
       sessionStorage.setItem(LOGIN_DAY_KEY, getTodayKey())
       setScoped(getScopedLocalData(data, selectedInstitution.id))
       return { ok: true }
+    }
+
+    if (!supabase) {
+      return { ok: false, message: 'Aktif kurum bulunamadı.' }
     }
 
     setAuthError('')
@@ -761,7 +767,7 @@ export function InstitutionProvider({ children }) {
   }, [])
 
   async function addStudent(nextStudent) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -822,7 +828,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function updateStudent(studentId, nextStudent) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -909,7 +915,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function deleteStudent(studentId) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -978,7 +984,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function saveAttendanceBatch(records) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1189,7 +1195,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function addMessage(nextMessage) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1235,7 +1241,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function markMessageSent(messageId) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1305,7 +1311,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function addMessageTemplate(nextTemplate) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1350,7 +1356,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function updateMessageTemplate(templateId, nextTemplate) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1411,7 +1417,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function deleteMessageTemplate(templateId) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1453,7 +1459,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function addParentNote(nextNote) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1503,7 +1509,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function updateSettings(nextSettings) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1574,7 +1580,7 @@ export function InstitutionProvider({ children }) {
   }
 
   async function deleteParentNote(noteId) {
-    if (!supabase || !session?.institutionId) {
+    if (!supabase || !authSession || !session?.institutionId) {
       if (!session?.institutionId) {
         return { ok: false, message: 'Önce kurum girişi yapın.' }
       }
@@ -1684,7 +1690,7 @@ export function InstitutionProvider({ children }) {
     updateSettings,
     updatePassword,
     refreshInstitutionData: () =>
-      supabase
+      supabase && authSession
         ? loadInstitutionData(session?.institutionId)
         : setScoped(getScopedLocalData(data, session?.institutionId)),
   }
