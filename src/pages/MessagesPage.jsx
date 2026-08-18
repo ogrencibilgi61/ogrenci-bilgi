@@ -18,22 +18,6 @@ const templateVariables = [
   '{kurum_adi}',
 ]
 
-const personalizedTemplateVariables = [
-  '{veli_adi}',
-  '{ogrenci_adi}',
-  '{sinif}',
-  '{toplam_devamsizlik}',
-]
-
-const sharedTemplateVariables = ['{tarih}', '{kurum_adi}']
-
-const broadcastFallbacks = {
-  '{veli_adi}': 'Velimiz',
-  '{ogrenci_adi}': 'ogrenciniz',
-  '{sinif}': 'sinif bilgisi',
-  '{toplam_devamsizlik}': 'ilgili devamsizlik bilgisi',
-}
-
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10)
 }
@@ -77,26 +61,6 @@ function buildMessage(templateBody, student, date, absenceCount, institutionName
   )
 }
 
-function buildBroadcastMessage(templateBody, date, institutionName) {
-  const replacements = {
-    '{tarih}': date,
-    '{kurum_adi}': institutionName ?? '',
-  }
-
-  return sharedTemplateVariables.reduce(
-    (message, variable) => message.replaceAll(variable, replacements[variable]),
-    templateBody,
-  )
-}
-
-function makeMessageBroadcastSafe(message) {
-  return Object.entries(broadcastFallbacks).reduce(
-    (currentMessage, [variable, fallback]) =>
-      currentMessage.replaceAll(variable, fallback),
-    message,
-  )
-}
-
 async function copyText(text) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text)
@@ -112,15 +76,6 @@ async function copyText(text) {
   textarea.select()
   document.execCommand('copy')
   document.body.removeChild(textarea)
-}
-
-function openWhatsAppShare(message) {
-  const shareUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
-  const popup = window.open(shareUrl, '_blank', 'noopener,noreferrer')
-
-  if (!popup) {
-    window.location.href = shareUrl
-  }
 }
 
 function MessagesPage() {
@@ -160,17 +115,6 @@ function MessagesPage() {
   const templateBody =
     selectedTemplate?.body ||
     'Sayin {veli_adi}, {ogrenci_adi} icin bilgilendirme mesajidir. {kurum_adi}'
-  const institutionName = scoped.settings?.institution_name || session.institutionName
-  const hasPersonalizedVariables = personalizedTemplateVariables.some((variable) =>
-    templateBody.includes(variable),
-  )
-  const broadcastMessage = buildBroadcastMessage(
-    templateBody,
-    messageDate,
-    institutionName,
-  )
-  const safeBroadcastMessage = makeMessageBroadcastSafe(broadcastMessage)
-
   const statusByStudent = useMemo(() => {
     return scoped.attendance
       .filter((record) => record.date === messageDate)
@@ -290,29 +234,6 @@ function MessagesPage() {
     )
 
     return `https://wa.me/${phone}?text=${encodeURIComponent(body)}`
-  }
-
-  async function handleBroadcastPrepare() {
-    setNotice('')
-    setError('')
-
-    if (!recipientsWithPhone.length) {
-      setError('Bu filtrelerde telefon numarasi olan alici bulunamadi.')
-      return
-    }
-
-    try {
-      await copyText(safeBroadcastMessage)
-      openWhatsAppShare(safeBroadcastMessage)
-      setNotice(
-        `${recipientsWithPhone.length} veli icin toplu mesaj hazirlandi. WhatsApp acilinca toplu mesaj listenizi secip gonderebilirsiniz.${hasPersonalizedVariables ? ' Kisiye ozel alanlar toplu mesaj icin genel ifadeye cevrildi.' : ''}`,
-      )
-    } catch {
-      openWhatsAppShare(safeBroadcastMessage)
-      setNotice(
-        `${recipientsWithPhone.length} veli icin WhatsApp toplu mesaj ekrani acildi.`,
-      )
-    }
   }
 
   async function handleCopyBroadcastNumbers() {
@@ -538,14 +459,6 @@ function MessagesPage() {
           </label>
         </form>
 
-        <button
-          className="primary-button bulk-send-button"
-          type="button"
-          onClick={handleBroadcastPrepare}
-          disabled={!recipientsWithPhone.length}
-        >
-          WhatsApp'ta toplu mesaji ac
-        </button>
         <div className="bulk-message-actions">
           <button
             className="secondary-button"
@@ -564,11 +477,6 @@ function MessagesPage() {
             Kisiye ozel ayri mesajlari ac
           </button>
         </div>
-        <p className="bulk-message-note">
-          WhatsApp acildiginda toplu mesaj listenizi secin; alicilar birbirini
-          gormez. Kisiye ozel ogrenci metni gerekiyorsa ayri mesaj akisini
-          kullanin.
-        </p>
 
         <div className="card-grid">
           {filteredStudents.map((student) => {

@@ -7,7 +7,7 @@ const primaryNavigation = [
   { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
   { label: 'Öğrenciler', path: '/ogrenciler', icon: 'students' },
   { label: 'Yoklama', path: '/yoklama', icon: 'attendance' },
-  { label: 'Toplu Mesaj', path: '/mesajlar', icon: 'messages' },
+  { label: 'Mesajlar', path: '/mesajlar', icon: 'messages' },
 ]
 
 const secondaryNavigation = [
