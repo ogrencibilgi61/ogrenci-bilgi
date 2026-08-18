@@ -36,7 +36,7 @@ Veli kayit veya veli giris alani yoktur. Veli iletisimleri, ogrenci kartindaki v
 - Veli notlari ve hatirlatma tarihleri
 - Devamsizlik esigi, tarih araligi, sinif ve ogrenci bazli raporlar
 - Kurum profili, kapasite, sinif listesi, personel listesi ve sifre ayarlari
-- Supabase baglantisi olmadan deneme icin local veri modu
+- Supabase baglantisi olmadan bos local veri modu
 
 ## Sayfalar
 
@@ -96,28 +96,20 @@ VITE_DATA_MODE=supabase
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon public key |
 | `VITE_ADMIN_PASSWORD` | `/admin/login` icin idareci sifresi |
 | `VITE_BASE_PATH` | Vite base path. GitHub Pages icin genelde repo adidir. |
-| `VITE_DATA_MODE` | Varsayilan `supabase`. `local` yapilirsa demo veriler localStorage ile kullanilir. |
+| `VITE_DATA_MODE` | Varsayilan `supabase`. `local` yapilirsa veriler localStorage ile kullanilir. |
 
 `VITE_BASE_PATH` verilmezse Vite config once `GITHUB_REPOSITORY` ortam degiskeninden repo adini uretir. O da yoksa `/ogrenci-bilgi/` kullanilir.
 
 ## Local Veri Modu
 
-Supabase kurmadan uygulamayi denemek icin `.env` icinde su degeri kullanabilirsiniz:
+Supabase kurmadan uygulamayi yerel veriyle kullanmak icin `.env` icinde su degeri kullanabilirsiniz:
 
 ```text
 VITE_DATA_MODE=local
 VITE_ADMIN_PASSWORD=admin123
 ```
 
-Bu modda veriler `src/data/institutionData.js` icindeki ornek kayitlardan baslar ve tarayici `localStorage` alaninda tutulur.
-
-Ornek kurum girisleri:
-
-```text
-kadikoy@ornek.com / 1234
-besiktas@ornek.com / 2468
-cankaya@ornek.com / 1357
-```
+Bu modda veri seti bos baslar ve tarayici `localStorage` alaninda tutulur. Ilk kurumlari `/admin/login` sonrasinda idareci panelinden ekleyebilirsiniz.
 
 Idareci girisi icin `.env` icindeki `VITE_ADMIN_PASSWORD` kullanilir.
 
